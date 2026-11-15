@@ -6,6 +6,19 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #1a1a2e; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: Tahoma, sans-serif; overflow: hidden; }
+  
+  /* صفحه لودینگ اولیه */
+  #preloader {
+    position: fixed; inset: 0; background: #1a1a2e; z-index: 9999;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    color: white; transition: opacity 0.8s ease;
+  }
+  .spinner {
+    width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.2);
+    border-top-color: #e94560; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
   .slideshow { position: relative; width: 90vw; height: 80vh; max-width: 1200px; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
   .slide { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.7s ease; pointer-events: none; }
   .slide.active { opacity: 1; pointer-events: auto; }
@@ -26,17 +39,23 @@
 </head>
 <body>
 
+<!-- صفحه لودینگ -->
+<div id="preloader">
+  <div class="spinner"></div>
+  <div>در حال آماده‌سازی اسلایدها...</div>
+</div>
+
 <div class="slideshow" id="slideshow">
-  <!-- اسلایدها با نام دقیق فایل‌های شما -->
-  <div class="slide active"><img src="./Slide1.PNG" alt="1"></div>
-  <div class="slide"><img src="./Slide2.PNG" alt="2"></div>
-  <div class="slide"><img src="./Slide3.PNG" alt="3"></div>
-  <div class="slide"><img src="./Slide4.PNG" alt="4"></div>
-  <div class="slide"><img src="./Slide5.PNG" alt="5"></div>
-  <div class="slide"><img src="./Slide6.PNG" alt="6"></div>
-  <div class="slide"><img src="./Slide7.PNG" alt="7"></div>
-  <div class="slide"><img src="./Slide8.PNG" alt="8"></div>
-  <div class="slide"><img src="./Slide9.PNG" alt="9"></div>
+  <!-- اسلایدها (تصاویر با lazy loading بارگذاری می‌شوند) -->
+  <div class="slide active"><img data-src="./Slide1.PNG" alt="1"></div>
+  <div class="slide"><img data-src="./Slide2.PNG" alt="2"></div>
+  <div class="slide"><img data-src="./Slide3.PNG" alt="3"></div>
+  <div class="slide"><img data-src="./Slide4.PNG" alt="4"></div>
+  <div class="slide"><img data-src="./Slide5.PNG" alt="5"></div>
+  <div class="slide"><img data-src="./Slide6.PNG" alt="6"></div>
+  <div class="slide"><img data-src="./Slide7.PNG" alt="7"></div>
+  <div class="slide"><img data-src="./Slide8.PNG" alt="8"></div>
+  <div class="slide"><img data-src="./Slide9.PNG" alt="9"></div>
 
   <button class="nav-btn prev" onclick="prevSlide()">❯</button>
   <button class="nav-btn next" onclick="nextSlide()">❮</button>
@@ -55,34 +74,38 @@
   const counter = document.getElementById('counter');
   const progress = document.getElementById('progress');
   const playBtn = document.getElementById('playBtn');
+  const preloader = document.getElementById('preloader');
   let current = 0;
   let autoPlay = null;
+
+  // تابع هوشمند برای بارگذاری تصویر
+  function loadSlideImage(index) {
+    const img = slides[index].querySelector('img');
+    if (img && !img.src) {
+      img.src = img.getAttribute('data-src'); // تصویر را دانلود می‌کند
+    }
+  }
 
   function showSlide(index) {
     slides.forEach(s => s.classList.remove('active'));
     slides[index].classList.add('active');
     counter.textContent = (index + 1) + ' / ' + slides.length;
     progress.style.width = ((index + 1) / slides.length * 100) + '%';
+    
+    // بارگذاری تصویر فعلی
+    loadSlideImage(index);
+    // بارگذاری تصویر بعدی (برای اینکه وقتی رفتیم جلو، فوری باشد)
+    if (index + 1 < slides.length) loadSlideImage(index + 1);
   }
 
-  function nextSlide() {
-    current = (current + 1) % slides.length;
-    showSlide(current);
-  }
-
-  function prevSlide() {
-    current = (current - 1 + slides.length) % slides.length;
-    showSlide(current);
-  }
+  function nextSlide() { current = (current + 1) % slides.length; showSlide(current); }
+  function prevSlide() { current = (current - 1 + slides.length) % slides.length; showSlide(current); }
 
   function togglePlay() {
     if (autoPlay) {
-      clearInterval(autoPlay);
-      autoPlay = null;
-      playBtn.textContent = '▶ پخش خودکار';
+      clearInterval(autoPlay); autoPlay = null; playBtn.textContent = '▶ پخش خودکار';
     } else {
-      autoPlay = setInterval(nextSlide, 4000);
-      playBtn.textContent = '⏸ توقف';
+      autoPlay = setInterval(nextSlide, 4000); playBtn.textContent = '⏸ توقف';
     }
   }
 
@@ -92,6 +115,25 @@
     if (e.key === ' ') { e.preventDefault(); togglePlay(); }
   });
 
+  // === شروع کار ===
+  // ۱. اولین تصویر را لود کن
+  loadSlideImage(0);
+  
+  // ۲. بعد از اینکه اولین تصویر آماده شد، لودینگ را ببند
+  const firstImg = slides[0].querySelector('img');
+  firstImg.onload = () => {
+    preloader.style.opacity = '0';
+    setTimeout(() => { preloader.style.display = 'none'; }, 800);
+  };
+
+  // ۳. بقیه تصاویر را در پس‌زمینه (بی‌صدا) لود کن تا کاربر متوجه نشود
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      slides.forEach((_, i) => loadSlideImage(i));
+    }, 2000); // ۲ ثانیه بعد از لود کامل صفحه
+  });
+
+  // نمایش اسلاید اول
   showSlide(0);
 </script>
 </body>
