@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>اسلایدشو</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    background: #1a1a2e;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: Tahoma, sans-serif;
+    overflow: hidden;
+  }
+
+  .slideshow {
+    position: relative;
+    width: 90vw;
+    height: 80vh;
+    max-width: 1200px;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    pointer-events: none;
+  }
+
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .slide img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    user-select: none;
+  }
+
+  /* کنترل‌ها */
+  .controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  button {
+    background: #e94560;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.25s;
+    font-family: inherit;
+  }
+
+  button:hover { background: #ff5c77; transform: translateY(-2px); }
+  button:active { transform: translateY(0); }
+
+  .counter {
+    color: #fff;
+    font-size: 16px;
+    min-width: 70px;
+    text-align: center;
+  }
+
+  /* دکمه‌های کناری */
+  .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.45);
+    color: #fff;
+    border: none;
+    font-size: 32px;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.25s;
+    z-index: 10;
+  }
+
+  .nav-btn:hover { background: rgba(233,69,96,0.85); }
+  .nav-btn.prev { right: 15px; }
+  .nav-btn.next { left: 15px; }
+
+  .progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: #e94560;
+    width: 0;
+    transition: width 0.3s;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+
+<div class="slideshow" id="slideshow">
+  <!-- اسلایدها -->
+  <div class="slide active"><img src="1.png" alt="1"></div>
+  <div class="slide"><img src="2.png" alt="2"></div>
+  <div class="slide"><img src="3.png" alt="3"></div>
+  <div class="slide"><img src="4.png" alt="4"></div>
+  <div class="slide"><img src="5.png" alt="5"></div>
+  <div class="slide"><img src="6.png" alt="6"></div>
+  <div class="slide"><img src="7.png" alt="7"></div>
+  <div class="slide"><img src="8.png" alt="8"></div>
+  <div class="slide"><img src="9.png" alt="9"></div>
+
+  <!-- دکمه‌های کناری -->
+  <button class="nav-btn prev" onclick="prevSlide()">❯</button>
+  <button class="nav-btn next" onclick="nextSlide()">❮</button>
+
+  <!-- نوار پیشرفت -->
+  <div class="progress" id="progress"></div>
+</div>
+
+<div class="controls">
+  <button onclick="prevSlide()">قبلی</button>
+  <button onclick="togglePlay()" id="playBtn">▶ پخش خودکار</button>
+  <button onclick="nextSlide()">بعدی</button>
+  <span class="counter" id="counter">1 / 9</span>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const playBtn = document.getElementById('playBtn');
+  let current = 0;
+  let autoPlay = null;
+
+  function showSlide(index) {
+    slides.forEach(s => s.classList.remove('active'));
+    slides[index].classList.add('active');
+    counter.textContent = (index + 1) + ' / ' + slides.length;
+    progress.style.width = ((index + 1) / slides.length * 100) + '%';
+  }
+
+  function nextSlide() {
+    current = (current + 1) % slides.length;
+    showSlide(current);
+  }
+
+  function prevSlide() {
+    current = (current - 1 + slides.length) % slides.length;
+    showSlide(current);
+  }
+
+  function togglePlay() {
+    if (autoPlay) {
+      clearInterval(autoPlay);
+      autoPlay = null;
+      playBtn.textContent = '▶ پخش خودکار';
+    } else {
+      autoPlay = setInterval(nextSlide, 3000); // هر ۳ ثانیه
+      playBtn.textContent = '⏸ توقف';
+    }
+  }
+
+  // کنترل با کیبورد
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') nextSlide();
+    if (e.key === 'ArrowRight') prevSlide();
+    if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+  });
+
+  showSlide(0);
+</script>
+
+</body>
+</html>
