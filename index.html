@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>...| پاور حسن احرامی |...</title>
+<title>حسن احرامی</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   
@@ -115,21 +115,38 @@
     transition: width 0.3s;
     z-index: 10;
   }
+  
+  /* لودینگ */
+  .loader {
+    position: fixed;
+    inset: 0;
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    z-index: 100;
+    font-size: 20px;
+    transition: opacity 0.5s;
+  }
 </style>
 </head>
 <body>
 
+<!-- صفحه لودینگ اولیه -->
+<div class="loader" id="loader">در حال بارگذاری...</div>
+
 <div class="slideshow" id="slideshow">
-    <!-- اسلایدها -->
-    <div class="slide active"><img src="./p1.png" alt="1"></div>
-    <div class="slide"><img src="./p2.png" alt="2"></div>
-    <div class="slide"><img src="./p3.png" alt="3"></div>
-    <div class="slide"><img src="./p4.png" alt="4"></div>
-    <div class="slide"><img src="./p5.png" alt="5"></div>
-    <div class="slide"><img src="./p6.png" alt="6"></div>
-    <div class="slide"><img src="./p7.png" alt="7"></div>
-    <div class="slide"><img src="./p8.png" alt="8"></div>
-    <div class="slide"><img src="./p9.png" alt="9"></div>
+  <!-- اسلایدها (نام‌ها اصلاح شدند) -->
+  <div class="slide active"><img src="./Slide1.PNG" alt="1"></div>
+  <div class="slide"><img src="./Slide2.PNG" alt="2"></div>
+  <div class="slide"><img src="./Slide3.PNG" alt="3"></div>
+  <div class="slide"><img src="./Slide4.PNG" alt="4"></div>
+  <div class="slide"><img src="./Slide5.PNG" alt="5"></div>
+  <div class="slide"><img src="./Slide6.PNG" alt="6"></div>
+  <div class="slide"><img src="./Slide7.PNG" alt="7"></div>
+  <div class="slide"><img src="./Slide8.PNG" alt="8"></div>
+  <div class="slide"><img src="./Slide9.PNG" alt="9"></div>
 
   <!-- دکمه‌های کناری -->
   <button class="nav-btn prev" onclick="prevSlide()">❯</button>
@@ -151,8 +168,15 @@
   const counter = document.getElementById('counter');
   const progress = document.getElementById('progress');
   const playBtn = document.getElementById('playBtn');
+  const loader = document.getElementById('loader');
   let current = 0;
   let autoPlay = null;
+
+  // مخفی کردن صفحه لودینگ بعد از بارگذاری کامل
+  window.addEventListener('load', () => {
+    loader.style.opacity = '0';
+    setTimeout(() => { loader.style.display = 'none'; }, 500);
+  });
 
   function showSlide(index) {
     slides.forEach(s => s.classList.remove('active'));
@@ -177,7 +201,7 @@
       autoPlay = null;
       playBtn.textContent = '▶ پخش خودکار';
     } else {
-      autoPlay = setInterval(nextSlide, 3000); // هر ۳ ثانیه
+      autoPlay = setInterval(nextSlide, 4000); // هر ۴ ثانیه تغییر کرد
       playBtn.textContent = '⏸ توقف';
     }
   }
@@ -187,6 +211,13 @@
     if (e.key === 'ArrowLeft') nextSlide();
     if (e.key === 'ArrowRight') prevSlide();
     if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+  });
+
+  // پیش‌بارگذاری تصاویر در پس‌زمینه
+  slides.forEach(slide => {
+    const img = slide.querySelector('img');
+    const preloadImg = new Image();
+    preloadImg.src = img.src;
   });
 
   showSlide(0);
