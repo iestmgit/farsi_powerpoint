@@ -46,16 +46,16 @@
 </div>
 
 <div class="slideshow" id="slideshow">
-  <!-- اسلایدها (تصاویر با lazy loading بارگذاری می‌شوند) -->
-  <div class="slide active"><img data-src="./Slide1.PNG" alt="1"></div>
-  <div class="slide"><img data-src="./Slide2.PNG" alt="2"></div>
-  <div class="slide"><img data-src="./Slide3.PNG" alt="3"></div>
-  <div class="slide"><img data-src="./Slide4.PNG" alt="4"></div>
-  <div class="slide"><img data-src="./Slide5.PNG" alt="5"></div>
-  <div class="slide"><img data-src="./Slide6.PNG" alt="6"></div>
-  <div class="slide"><img data-src="./Slide7.PNG" alt="7"></div>
-  <div class="slide"><img data-src="./Slide8.PNG" alt="8"></div>
-  <div class="slide"><img data-src="./Slide9.PNG" alt="9"></div>
+  <!-- اسلایدها: پسوند به jpg تغییر کرد -->
+  <div class="slide active"><img data-src="./Slide1.jpg" alt="1"></div>
+  <div class="slide"><img data-src="./Slide2.jpg" alt="2"></div>
+  <div class="slide"><img data-src="./Slide3.jpg" alt="3"></div>
+  <div class="slide"><img data-src="./Slide4.jpg" alt="4"></div>
+  <div class="slide"><img data-src="./Slide5.jpg" alt="5"></div>
+  <div class="slide"><img data-src="./Slide6.jpg" alt="6"></div>
+  <div class="slide"><img data-src="./Slide7.jpg" alt="7"></div>
+  <div class="slide"><img data-src="./Slide8.jpg" alt="8"></div>
+  <div class="slide"><img data-src="./Slide9.jpg" alt="9"></div>
 
   <button class="nav-btn prev" onclick="prevSlide()">❯</button>
   <button class="nav-btn next" onclick="nextSlide()">❮</button>
@@ -116,17 +116,14 @@
   });
 
   // === شروع کار ===
-  // ۱. اولین تصویر را لود کن
   loadSlideImage(0);
   
-  // ۲. بعد از اینکه اولین تصویر آماده شد، لودینگ را ببند
   const firstImg = slides[0].querySelector('img');
   firstImg.onload = () => {
     preloader.style.opacity = '0';
     setTimeout(() => { preloader.style.display = 'none'; }, 800);
   };
 
-  // ۳. بقیه تصاویر را در پس‌زمینه (بی‌صدا) لود کن تا کاربر متوجه نشود
   window.addEventListener('load', () => {
     setTimeout(() => {
       slides.forEach((_, i) => loadSlideImage(i));
